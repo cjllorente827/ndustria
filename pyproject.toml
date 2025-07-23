@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ndustria"
+version = "2025.0.0"
+description = "Prevent Programs form Unnecessary Reruns"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [{name = "Mackenzie Ticoras", email = "scottm59@msu.edu"}]
+dependencies = [
+    "numpy",
+    "tabulate", 
+    "line_profiler",
+    "mpi4py",
+    "openmpi",
+    "matplotlib",
+] 
+requires-python = ">=3.8"
+
+[project.scripts]
+ndustria-init = "ndustria.ndustria_setup:main"

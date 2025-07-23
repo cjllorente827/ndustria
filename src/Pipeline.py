@@ -1,39 +1,42 @@
-"""Defines the Pipeline class that represents the full analysis pipeline
+"""
+Defines the Pipeline class that represents the full analysis pipeline
 
-A Pipeline is a singleton object that contains a list of Tasks and a list of Views
+A Pipeline is a singleton object that contains a list of Tasks. 
 When Pipeline.run() is called, the pipeline will attempt to execute any Tasks that 
 are indicated as ready by a call to Task.readyToRun(). A Task is ready if it either
 has no dependencies, or all its dependencies have completed. 
+Once all Tasks are complete, the Pipeline will exit the program.
 
 """
 
 import sys
 from .Task import Task, WAITING, DONE
 from .Cache import Cache
-from .View import View
 from .Logger import log, error
 import os, sys, tracemalloc
+import io
 
 from mpi4py import MPI
+from line_profiler import LineProfiler
 
 import functools
 
-
-
-
 class Pipeline:
-    """Class that contains a list of Tasks to execute as part of a data analysis pipeline"""
+    """Class that contains a list of Tasks and Views to execute as part of a data analysis pipeline"""
+
+    Tasks = [] 
+    """List of all Task objects in this Pipeline"""
     
     def __init__(self, 
                  name="",
                  parallel=False,
                  dryrun=False,
-                 timeit=True,
-                 memcheck=False
-        ):
+                 timeit=False,
+                 memcheck=False,
+                 profiling=False
+                 ):
         """Keyword arguments:
         name -- A name to give the pipeline for organizational purposes. If left blank, it will derive the name from the file used to run the code
-        rerun -- If True, removes any previous Task results from the cache. Causes every Task to run from scratch.
         parallel -- If True, uses a round robin approach to assign Tasks to multiple processes and runs them in parallel
         dryrun -- If True, skips running Tasks but does everything else, including creating log files. Used to test complex pipelines
         timeit -- If True, keeps track of wallclock time of each Task. These data will be output to a csv file in the cache. Set to True by default due to low overhead
@@ -44,10 +47,8 @@ class Pipeline:
         self.dryrun=dryrun
         self.timeit=timeit
         self.memcheck=memcheck
+        self.profiling=profiling
         
-        """List of all Task objects in this Pipeline"""
-        self.Tasks = []
-
 
         # name the pipeline after the file that ran it w/o .py
         # TODO: get basename from filepath as well
@@ -57,9 +58,12 @@ class Pipeline:
             self.name = name
         self.cache = Cache()
 
-        # TODO: Reconsider using the world comm
+        # TODO: This should get a communicator with a subset of the processes
+        # according to how many tasks it has
         self.comm = MPI.COMM_WORLD
 
+        #if self.isRoot():
+            #log(f"---\nPipeline {self.name} created with cache located at {self.cache.path}\n---\n")
 
     def AddFunction(self, rerun=False):
         def outer_wrapper(user_function):
@@ -75,7 +79,6 @@ class Pipeline:
 
             return inner_wrapper        
         return outer_wrapper
-
 
     def _addTask(self, 
         user_function, 
@@ -109,7 +112,6 @@ class Pipeline:
             # end if
         # end if
 
-
         return new_task
 
 
@@ -131,9 +133,9 @@ class Pipeline:
     """
     The main Task running function
     """
-    def run(self, run_all=False):
+    def run(self, run_all=False): 
         """
-        Runs a pipeline composed of ndustria Tasks and Views
+        Runs a pipeline , composed of ndustria Tasks and Views
 
         Step 1. Write functions that represent each stage of your analysis pipeline
         Step 2. Decorate your functions with the addTask and addView decorators as appropriate
@@ -148,7 +150,10 @@ class Pipeline:
             self.clearCache()
 
         if self.memcheck:
-            tracemalloc.start(25) # TODO: Move this to config file
+            tracemalloc.start(25) # TODO: Move this to .env
+
+        # if self.profiling:
+        #     print("Understanding Anything?")
 
         self.comm.Barrier()
 
@@ -175,6 +180,7 @@ class Pipeline:
 
                         try:
                             task.run()
+
                         except Exception as e:
                             ex_type, ex_value, ex_traceback = sys.exc_info()
                             error(ex_type.__name__ +' '+ str(ex_value), 
@@ -207,8 +213,6 @@ class Pipeline:
 
         if self.isRoot(): log(f"Finished all tasks after {iterations} iterations")
 
-        run_this_iteration = []
-
         # TODO: Fix this so it works in parallel
         if self.timeit:
             # save it to cache for internal use
@@ -219,10 +223,17 @@ class Pipeline:
 
         if self.memcheck:
             memcheck_data_file = os.path.join(self.cache.path, f"{self.name}_memcheck.csv")
-
             with open(memcheck_data_file, "w") as memcheck_data:
                 for task in self.Tasks:
                     memcheck_data.write(f"{task.user_function.__name__}, {task.initial_mem}, {task.final_mem}, {task.peak_mem}\n")
+
+        if self.profiling:
+            profiling_data_file = os.path.join(self.cache.path, f"{self.name}_profile.txt")
+            with open(profiling_data_file, "w") as profile_data:
+                for task in self.Tasks:
+                    output_stream = io.StringIO()
+                    task.line_profile.print_stats(stream=output_stream)
+                    profile_data.write(output_stream.getvalue())
 
         if self.isRoot(): log("All done.")
           
@@ -230,13 +241,13 @@ class Pipeline:
     def printCacheInfo(self):
         """Prints the cache info file to console. Not supported on Windows"""
 
-        # TODO: change this to something that would work on Windows
+        # because windows users can fucking die
         os.system(f"cat {self.cache.info_file}")
 
     def printLog(self):
         """Prints the log file to console. Not supported on Windows"""
 
-        # TODO: change this to something that would work on Windows
+        # because windows users can fucking die
         os.system(f"cat {self.cache.log_file}")
 
     def clearCache(self):
@@ -324,3 +335,5 @@ class Pipeline:
         # delete temp folder
         rm_cmd = f"rm -r {temp_dir}"
         os.system(rm_cmd)
+
+
