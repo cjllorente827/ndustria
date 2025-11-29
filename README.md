@@ -2,7 +2,10 @@
 
 ## ToDo:
 * Profiling in parallel
-* Clean out cache/Delete functions from cache
+* When ndustria reads in "cached" information does that data automatically go to my computer's memory
+    * Load memory on an as needed basis
+    * After using task result set task result to null and that will cause python to clear the memory 
+    * Config setting: Maximum file size to keep in memory 
 
 # Main features 
 
@@ -369,6 +372,8 @@ ndustria -c
 
 The log file is a log of the most recent Pipeline run. This is a condensed version of that run which pulls out information about the processing and execution of ndustria tasks 
 
+
+[Error] Looks like the last run didn't complete any Tasks. Use "ndustria -l" to see what went wrong. Exiting.
 
 
 

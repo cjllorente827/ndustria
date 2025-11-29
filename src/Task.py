@@ -103,7 +103,7 @@ class Task:
         # figure out if this Task has a result in cache already and load it
         if rerun != True and self.pipeline.cache.exists(self):
             self.status = DONE
-            self.getResult()
+            # self.getResult()
             
     # end __init__      
         

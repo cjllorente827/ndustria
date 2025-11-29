@@ -1,7 +1,6 @@
 import pickle, os
 from tabulate import tabulate
 from .Logger import log, error, setLogFile
-# from .Config import load_config
 
 # including numpy support
 import numpy as np
@@ -154,7 +153,6 @@ Task Information:
 
         self.info_file = os.path.join(self.path, "cache_info")
         touch(self.info_file)
-
         
         self.log_file = os.path.join(self.path, "last_run.log")
         setLogFile(self.log_file)
