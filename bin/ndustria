@@ -3,14 +3,14 @@
 import argparse, os 
 import matplotlib.pyplot as plt
 import numpy as np
+# import csv
 
 # I know what I'm about
 plt.style.use('dark_background')
 plt.rcParams.update({'font.size': 16})
 
 usage_string = """
-This is a utility script for ndustria that performs some useful functions to help
-debug and monitor code pipelines. 
+Here are the terminal commands for ndustria 
 
 See what's in the cache:
 ndustria -c 
@@ -32,6 +32,9 @@ See the log of the last run pipeline:
 ndustria -l
 ndustria --log
 
+Deleted cached items in cache directory
+ndustria -d <name-of-file>
+ndustria --delete_cache <name-of-file>
 """
 
 parser = argparse.ArgumentParser(
@@ -42,8 +45,9 @@ parser = argparse.ArgumentParser(
 parser.add_argument('-c', '--cache', action='store_true')
 parser.add_argument('-t', '--timeit', action='store', type=str)
 parser.add_argument('-m', '--memcheck', action='store', type=str)
-parser.add_argument('-l', '--log', action='store_true')
 parser.add_argument('-p', '--profiling', action='store', type=str)
+parser.add_argument('-l', '--log', action='store_true')
+parser.add_argument('-d', '--delete_cache', type=str)
 
 args = parser.parse_args()
 
@@ -161,9 +165,42 @@ if (args.memcheck):
     plt.title("Memory usage by function")
     plt.show()
 
+if(args.delete_cache):
 
+    cache_info = os.path.join(cache_dir, "cache_info")
 
+    with open(cache_info, "r") as cif:
+        lines = cif.readlines()
+        first_five = lines[:5]
+        lines = lines[5:]
 
+        task_temp  = [line.split(" ")[0].strip() for line in lines]
+        task_names = [t.split("(")[0] for t in task_temp] 
+        file_loc   = [line.split(" ")[-1].strip() for line in lines]
 
+        files_deleted = []  
+        try:
+            indices = [i for i, val in enumerate(task_names) if val == args.delete_cache]
+            for idx in indices:
+                file_to_delete = os.path.join(cache_dir, file_loc[idx])
+                if not os.path.isfile(file_to_delete):
+                    print(f"[Error] Cache entry {file_to_delete} not found.")
+                    exit()
+                confirm = input(f"Are you sure you want to delete the cache directory {task_temp[idx]}? This action cannot be undone. (y/n): ")
+                if confirm.lower() == 'y':
+                    os.remove(file_to_delete)     
+                    print(f"Cache directory {file_to_delete} has been deleted.")
+                    files_deleted.append(idx)
 
+                    with open(cache_info, "w") as cifw:
+                        for lin in first_five:
+                            cifw.write(lin)
+                        for n, lin in enumerate(lines):
+                            if n not in files_deleted: 
+                                cifw.write(lin)
+                else:
+                    print("Deletion cancelled.")
 
+        except ValueError:
+            print(f"[Error] Cache entry {args.delete_cache} not found.")
+            exit()
