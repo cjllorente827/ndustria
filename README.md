@@ -2,10 +2,10 @@
 
 ## ToDo:
 * Profiling in parallel
-* When ndustria reads in "cached" information does that data automatically go to my computer's memory
-    * Load memory on an as needed basis
-    * After using task result set task result to null and that will cause python to clear the memory 
-    * Config setting: Maximum file size to keep in memory 
+<!-- * When ndustria reads in "cached" information does that data automatically go to my computer's memory
+    * Load memory on an as needed basis -->
+* After using task result set task result to null and that will cause python to clear the memory 
+* Config setting: Maximum file size to keep in memory 
 
 # Main features 
 
