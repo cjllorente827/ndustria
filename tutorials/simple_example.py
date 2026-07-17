@@ -1,5 +1,5 @@
-from ndustria import Pipeline
 import numpy as np
+from ndustria import Pipeline
 
 pipe = Pipeline()
 
@@ -21,9 +21,10 @@ def matrix_parameters(matrix):
     print("Total Number of Elements:", num_rows*num_cols)
     print("----------------------------------------\n")
 
-    return 0
+    return 
           
 def main(): 
+
     for i in range(10, 15):
         random_arrays = matrix_multiplication(N=2**i)
         matrix_parameters(random_arrays)

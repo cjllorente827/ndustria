@@ -19,5 +19,14 @@ dependencies = [
 ] 
 requires-python = ">=3.8"
 
+[project.optional-dependencies]
+docs = [
+  "sphinx>=5.0",
+  "sphinx-rtd-theme",
+  "myst-parser",
+  "sphinx-autodoc-typehints",
+  "sphinx-autobuild",
+]
+
 [project.scripts]
 ndustria-init = "ndustria.ndustria_setup:main"

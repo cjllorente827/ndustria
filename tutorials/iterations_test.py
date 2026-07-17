@@ -1,14 +1,16 @@
-from ndustria import Pipeline
 import numpy as np
+from ndustria import Pipeline
 
 pipe = Pipeline()
 
-@pipe.AddFunction()
+rerun = True
+
+@pipe.AddFunction(rerun = rerun)
 def create_random_array(N=10):
     arr = np.random.rand(N)
     return arr
 
-@pipe.AddFunction()
+@pipe.AddFunction(rerun = rerun)
 def do_sum(data):
 
     result = {
@@ -17,7 +19,7 @@ def do_sum(data):
     }
     return result
 
-@pipe.AddFunction()
+@pipe.AddFunction(rerun = rerun)
 def do_mean(data):
 
     result = {
@@ -26,7 +28,7 @@ def do_mean(data):
     }
     return result
 
-@pipe.AddFunction()
+@pipe.AddFunction(rerun = rerun)
 def do_std(data):
 
     result = {
@@ -35,19 +37,17 @@ def do_std(data):
     }
     return result
 
-@pipe.AddFunction()
+@pipe.AddFunction(rerun = rerun)
 def view_data(sum_data, mean_data, std_data):
 
     print(f"""
-Viewing data for {sum_data['length']} random numbers: 
-        Sum     : {sum_data['sum']}
-        Mean    : {mean_data['mean']}
-        Std dev : {std_data['std']}
-""")
+    Viewing data for {sum_data['length']} random numbers: 
+            Sum     : {sum_data['sum']}
+            Mean    : {mean_data['mean']}
+            Std dev : {std_data['std']}
+    """)
           
     return "no_result"
-
-
 
 for i in range(5, 8):
     N = 10**i
@@ -57,5 +57,4 @@ for i in range(5, 8):
     c = do_std(random_array)
     view_data(a,b,c)
 
-
-pipe.run(run_all=True)
+pipe.run()

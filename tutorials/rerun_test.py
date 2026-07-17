@@ -1,5 +1,5 @@
-from ndustria import Pipeline
 import numpy as np
+from ndustria import Pipeline
 
 pipe = Pipeline()
 

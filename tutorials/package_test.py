@@ -5,8 +5,7 @@ then looking at the data locally on a laptop.
 """
 
 import numpy as np
-
-from ndustria import AddTask, Pipeline
+from ndustria import Pipeline
 
 pipe = Pipeline(name="package_test")
 
@@ -22,5 +21,4 @@ for i in range(10):
     create_random_array(i)
 
 pipe.run()
-
 pipe.pack(save_to="package_test.tar.gz")
