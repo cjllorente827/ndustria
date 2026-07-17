@@ -19,31 +19,6 @@ ndustria is being built as part of a PhD dissertation and is in active developme
 
 # Installation
 
-## Simple Use Installation  
-
-*** This is still a WIP. I have not posted it publicly yet ***  
-
-```
-pip install ndustria 
-```
-
-```
-ndustria-init
-```
-
-Since we have added things to path we need reinitialize the shell environment. If you are running bash use:
-```
-cd
-source .bashrc
-```
-If you are using another shell use the corresponding command.  
-
-You can now check that you can import and use ndustria
-```
-python -c "from ndustria import Pipeline"
-```
-
-## Development Installation 
 Clone Repository from github and enter into the directory
 ```
 git clone <YOUR_VERSION_URL>
@@ -56,11 +31,13 @@ pip install -e .
 ndustria-init
 ```
 `ndustria-init` creates a config file for ndustria and sets up your "cache" directory where the returns of your functions will be saved. If at any point you want to change your cache directory you must rerun `ndustria-init`. This script also adds a couple of things to path in your shell start up file. Therefore in order use ndustria you must reinitialize shell. If you have bash you can complete this with:
+
 ```
 cd
 source .bashrc
 ```
-If you use a different shell you must use whatever command corresponds to your shell. If you are running an environment (like conda) you may need to reinitialize it after you run `source .bashrc`
+
+If you use a different shell you must use whatever command corresponds to your shell. If you are also running an environment (like conda) you may need to reinitialize the enviornment after you run `source .bashrc`
 
 Check that you can import and use ndustria
 ```
@@ -84,7 +61,7 @@ def filterLargeTask(path, filter_params):   # <-- 4. Function that surrounds you
     return small_subset                     #<-- 5. Save your work to disk by adding it to the return statement
 ```
 
-Once you have added one or more functions to your `Pipeline()` you can use `pipe.run()` to execute your whole Pipeline. To see this in action please follow the **Tutorial**
+Once you have added one or more functions to your `Pipeline()` you can use `pipe.run()` to execute your whole Pipeline. To see this in action please follow the **Tutorials**
 
 # Tutorials
 
@@ -209,11 +186,11 @@ Finished all tasks after 0 iterations
 All done.
 ```
 
-This means that ndustria "recognizes" that we have run all of these scripts before and it would pull the data from disk if needed. Since all tasks have been run before ndustria does not execute any tasks.
+ndustria "recognizes" that we have run all of these tasks before and pulls the data from out `ndustria_cache` directory. Therefore no tasks are executed when we run the script a second time. 
 
 ## Rerun Parameter
 
-As we have seen from the last example ndustria *does not* rerun tasks that it has already run, in fact this is what it is designed to do. However, what if we wanted to force it to rerun a task regardless of whether or not we change the code. This can be done using the `rerun=True` parameter within the decorator (by default `rerun=False`). We can see this in `rerun_test.py` which is the same script as `simple_example.py` but the `matrix_parameters` function we have `rerun=True` in the decorator. When we run, 
+As we have seen from the last example ndustria *does not* rerun tasks that it has already run. This is what it is designed to do. However, what if we wanted to force it to rerun a task regardless of whether or not we change the code. This can be done using the `rerun=True` parameter within the decorator (by default `rerun=False`). We can see this in `rerun_test.py` which is the same script as `simple_example.py` but the `matrix_parameters` function we have `rerun=True` in the decorator. When we run, 
 
 ```
 python rerun_test.py
@@ -237,12 +214,12 @@ we can see the top of the output looks like
 ---
 ```
 
-Here ndustria runs the `matrix_parameters` tasks as instructed but does not run the `matrix_multiplication` tasks since we already have saved version of these functions and have not explicitly asked for them to be rerun. This can be helpful for debugging and recalling results from smaller functions that you may have printed to screen, etc. 
+Here ndustria runs the `matrix_parameters` tasks as instructed but does not run the `matrix_multiplication` tasks since we already have saved versions of these functions from when we ran `simple_example.py`. This highlights another key component of `ndustria` where it can pull cached results of a function even if the previous execution of that function was in a different script. 
 
 
 ## Pipeline Keyword Arguments 
 
-While `rerun` is the only keyword argument for individual decorators. ndustria `Pipelines` have a number of kwargs that can help you configure the run. By default all of these parameters are set to false, but we can experiment with setting them `True` in `pipeline_kwargs.py`. 
+While `rerun` is the only keyword argument for individual decorators. ndustria `Pipelines` have a number of kwargs that can help you configure your run. By default all of the booleans are set to false, but we can experiment with setting them `True` in `pipeline_kwargs.py`. 
 
 ```
 python pipeline_kwargs.py
@@ -330,7 +307,7 @@ ndustria -t kwargs
 
 ### profiling
 
-ndustria utilizes the package [Line Profiler](https://kernprof.readthedocs.io/en/latest/) which can look at the time utilization line by line for Tasks. This has a much higher over-head than `timeit` but produces a lot more data &mdash; not just which function takes up the most time, but which *line* in that function takes the most time. Line Profiling can be turned on with `profiling=True` and this creates a text file in the cache directory which can be accessed with `ndustria -p <name of script>`
+ndustria utilizes the package [Line Profiler](https://kernprof.readthedocs.io/en/latest/) which can look at the time utilization line by line for Tasks. This has a higher over-head than `timeit` but gives a lot more infomation. Line Profiler allows us to look at the time it takes line by line for a function to execute. Line Profiling can be turned on with `profiling=True` and this creates a text file in the cache directory which can be accessed with `ndustria -p <name of script>`
 
 We can add this to the script: 
 ```
@@ -358,23 +335,29 @@ ndustria -m kwargs
 
 ## Shell Commands 
 
-ndustria has a number of shell commands that can help you access the metadata that ndustria generates about your Pipelines. We have already seen some of these (`ndustria -p <name of script>`, `ndustria -t <name of script>`, `ndustria -m <name of script>`) which can be turned on with Pipeline kwargs. However, there is more metadata that ndustria generated automatically. 
+ndustria has a number of shell commands that can help you access the metadata that ndustria generates about your Pipelines. We have already seen some of these (`ndustria -p <name of script>`, `ndustria -t <name of script>`, `ndustria -m <name of script>`) associated with our specific Pipeline Kwargs. However, there is more metadata that ndustria generated automatically. 
 
-### cache file 
+### log command
 
-The cache file will show you all of the cached tasks you have stored in your ndustria cache directory and where that Information is stored. This is a good way to keep track of the Pipelines you have run and have not run.  
+`ndustria -l` or `ndustria --log` will show you the "log file" of your most recent Pipeline run. This is a condensed version of your run which will highlight ndustria's operations and any errors that migh occur during your run. If you run ends early due to an error you may see the message
+
+```
+[Error] Looks like the last run didn't complete any Tasks. Use "ndustria -l" to see what went wrong. Exiting.
+```
+prompting you to check the log file to find out more about your error. 
+
+
+### cache command
+
+`ndustria -c` or `ndustria --cache ` will show all of the cached tasks you have stored in your `ndustria_cache` directory. This is a good way to keep track of the tasks you have run.  
 
 ```
 ndustria -c
 ```
 
-### log file 
+### Delete command 
 
-The log file is a log of the most recent Pipeline run. This is a condensed version of that run which pulls out information about the processing and execution of ndustria tasks 
-
-
-[Error] Looks like the last run didn't complete any Tasks. Use "ndustria -l" to see what went wrong. Exiting.
-
+`ndustria -d <name-of-task>` or `ndustria --delete_cache <name-of-task>` is a way to clear tasks from your `ndustria_cache` directory. If you have many tasks with the same name (i.e. you make many calls to the same function). You will be asked before each 
 
 
 

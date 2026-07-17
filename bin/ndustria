@@ -33,8 +33,8 @@ ndustria -l
 ndustria --log
 
 Deleted cached items in cache directory
-ndustria -d <name-of-file>
-ndustria --delete_cache <name-of-file>
+ndustria -d <name-of-task>
+ndustria --delete_cache <name-of-task>
 """
 
 parser = argparse.ArgumentParser(
