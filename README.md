@@ -26,12 +26,22 @@ git clone https://github.com/cjllorente827/ndustria.git
 cd ndustria
 ```
 
-Pip install the package and run the set up bash script
+Install the package from the project root, making sure the shell stays in the same Python environment you used for `pip`:
 
 ```
-pip install -e .[docs]
+python3 -m pip install -e ".[docs]"
 ndustria-init
 ```
+
+The ` ".[docs]" ` implementation is optional and installs dependencies to render the documenation locally. Otherwise you can just use `pip install -e .`
+
+If you get `ModuleNotFoundError: ndustria`, run the import check with the same interpreter you used for installation:
+
+```
+python3 -c "from ndustria import Pipeline; print(Pipeline)"
+```
+
+On macOS, `pip` and `python` often point to different interpreters, so `python3 -m pip ...` is safer than `pip ...`.
 
 `ndustria-init` creates a config file for ndustria and sets up your "cache" directory where the returns of your functions will be saved. If at any point you want to change your cache directory you must rerun `ndustria-init`. This script also adds a couple of things to path in your shell start up file. Therefore in order use ndustria you must reinitialize shell. If you have bash you can complete this with:
 

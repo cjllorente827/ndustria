@@ -15,8 +15,13 @@ Pip install the package and run the set up bash script
 
 .. code-block:: 
 
-   pip install -e .[docs]
+   pip install -e ".[docs]"
    ndustria-init
+
+If your shell treats ``[]`` as glob characters, keep the quotes around ``.[docs]``.
+
+If you see ``ModuleNotFoundError: ndustria``, make sure you are using the same interpreter for installation and import checks. 
+On macOS, ``python3 -m pip install -e ".[docs]"`` is safer than ``pip install -e ".[docs]"``.
 
 :file:`ndustria-init` creates a config file for ndustria and sets up your "cache" directory where the returns of your functions will be saved. 
 If at any point you want to change your cache directory you must rerun :file:`ndustria-init`. 
@@ -36,5 +41,5 @@ Check that you can import and use ndustria
 
 .. code-block::
 
-   python
+   python3
    >>> from ndustria import Pipeline

@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools >= 61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "ndustria"
-version = "2025.0.0"
+version = "2026.0.0"
 description = "Streamlined data processing and visualization for large-scale simulations."
 readme = "README.md"
 license = {file = "LICENSE"}

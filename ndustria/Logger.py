@@ -1,11 +1,13 @@
 """
-Creates Functions that are used to create the last_run.log file which is save in the NDUSTRIA_CACHE_DIR
+Creates functions that are used to create the last_run.log file which is save in the NDUSTRIA_CACHE_DIR
 """
 
 import os
 DEBUG = True
 VERBOSE = True
 LOG_FILE = ""
+
+
 # Convenience debugger function
 # prints stuff out to log and console with [Debug] in front of it 
 # when DEBUG is set to True
@@ -62,6 +64,7 @@ def log(msg):
 
     if VERBOSE == True:
         print(msg)
+
 
 def setLogFile(filepath):
     global LOG_FILE 
