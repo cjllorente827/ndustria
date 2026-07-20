@@ -1,7 +1,7 @@
-from ndustria import Pipeline
 import numpy as np
+from ndustria.Pipeline import Pipeline
 
-pipe = Pipeline(name="test_kwargs", dryrun=False, timeit = False, profiling=False, memcheck = False, parallel = False)
+pipe = Pipeline(name="test_kwargs", dryrun= False, timeit = False, profiling=False, memcheck = False, parallel = False)
 
 @pipe.AddFunction(rerun = True)
 def matrix_multiplication(N=10):
@@ -24,7 +24,7 @@ def matrix_parameters(matrix):
     return 0
           
 def main(): 
-    for i in range(10, 15):
+    for i in range(9, 14):
         random_arrays = matrix_multiplication(N=2**i)
         matrix_parameters(random_arrays)
 

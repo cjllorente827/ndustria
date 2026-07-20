@@ -5,7 +5,7 @@ then looking at the data locally on a laptop.
 """
 
 import numpy as np
-from ndustria import Pipeline
+from ndustria.Pipeline import Pipeline
 
 pipe = Pipeline(name="package_test")
 

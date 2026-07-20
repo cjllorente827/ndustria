@@ -1,5 +1,5 @@
 import numpy as np
-from ndustria import Pipeline
+from ndustria.Pipeline import Pipeline
 
 pipe = Pipeline()
 
@@ -21,7 +21,7 @@ def matrix_parameters(matrix):
     print("Total Number of Elements:", num_rows*num_cols)
     print("----------------------------------------\n")
 
-    return 
+    return 0
           
 def main(): 
 
